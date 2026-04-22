@@ -362,12 +362,52 @@
     }
     .config-grid input:focus { border-color: var(--accent); }
     .config-grid input::placeholder { color: var(--muted); }
+    /* --- DISEÑO PARA EL MÓDULO DE VENTAS (REQUERIMIENTO 3CV2) --- */
+    #ventaModal .modal {
+      border-top: 4px solid var(--success); /* Línea verde para identificar ventas */
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Divide el espacio en dos columnas */
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    #vTotalDisplay {
+      font-family: 'DM Mono', monospace;
+      color: var(--accent); /* Color dorado/naranja de tu tema */
+      text-shadow: 0 0 10px rgba(232, 160, 32, 0.2);
+      font-weight: bold;
+    }
+
+    /* Estilo para los menús desplegables (Selects) */
+    #ventaModal select {
+      width: 100%;
+      padding: 0.7rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+
+    #ventaModal select:focus {
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Ferretería <span>Tico</span></div>
+  <nav style="display: flex; gap: 1rem; margin-left: 2rem;">
+    <button class="btn btn-ghost btn-sm" onclick="showSection('inventario')">Inventario</button>
+    <button class="btn btn-ghost btn-sm" onclick="openVentaModal()">Nueva Venta</button>
+    <button class="btn btn-ghost btn-sm" onclick="showSection('proveedores')">Proveedores</button>
+  </nav>
   <div class="db-badge" id="dbBadge">
     <div class="dot"></div>
     <span id="dbStatus">Sin conectar</span>
@@ -419,6 +459,7 @@
     <select id="filterCat" onchange="renderTable()">
       <option value="">Todas las categorías</option>
     </select>
+    <button class="btn btn-primary" style="background:#4caf50; margin-right:10px;" onclick="openVentaModal()"> Registrar Venta</button>
     <button class="btn btn-primary" onclick="openModal()">+ Agregar Producto</button>
   </div>
 
@@ -481,7 +522,39 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
+<div class="modal-overlay" id="ventaModal">
+    <div class="modal" style="max-width: 600px;">
+      <h2 style="color: var(--accent); font-family: 'Bebas Neue';">💰 Registrar Nueva Venta</h2>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Empleado</label>
+          <select id="vEmpleado"></select>
+        </div>
+        <div class="form-row">
+          <label>Cliente</label>
+          <select id="vCliente"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Producto</label>
+        <select id="vProducto" onchange="updateVentaPrecio()"></select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Cantidad</label>
+          <input type="number" id="vCant" value="1" min="1" oninput="updateVentaPrecio()">
+        </div>
+        <div class="form-row">
+          <label>Total a Cobrar</label>
+          <div id="vTotalDisplay" style="color:var(--accent); font-size:1.8rem; font-family:'DM Mono'; font-weight:bold;">$0.00</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeVentaModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="procesarVenta()">Confirmar Venta</button>
+      </div>
+    </div>
+  </div>
 <script>
 // ─────────────────────────────────────────────
 //  CONFIG & STATE
@@ -757,7 +830,86 @@ function showToast(msg, isErr = false) {
   t.className   = 'toast show' + (isErr ? ' error' : '');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  
+}
+  // ============================================================
+// LÓGICA DE VENTAS (CEREBRO DEL SISTEMA)
+// ============================================================
+
+// Función para abrir la ventana y traer datos de Supabase
+async function openVentaModal() {
+  if (demoMode) { 
+    showToast('Conecta Supabase para registrar ventas reales', true); 
+    return; 
+  }
+  
+  try {
+    const empleados = await supaFetch('empleado?select=*');
+    const clientes = await supaFetch('cliente?select=*');
+    
+    document.getElementById('vEmpleado').innerHTML = empleados.map(e => 
+      `<option value="${e.id}">${e.nombre}</option>`).join('');
+    
+    document.getElementById('vCliente').innerHTML = '<option value="">Venta de Mostrador</option>' + 
+      clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+    
+    document.getElementById('vProducto').innerHTML = products.map(p => 
+      `<option value="${p.id}" data-precio="${p.precio}">${p.nombre} (Stock: ${p.stock})</option>`).join('');
+    
+    document.getElementById('ventaModal').classList.add('open');
+    updateVentaPrecio(); 
+  } catch (e) {
+    showToast('Error al cargar datos: ' + e.message, true);
+  }
+}
+
+// Función para procesar la venta y descontar el stock
+async function procesarVenta() {
+  const idProd = document.getElementById('vProducto').value;
+  const cant = parseInt(document.getElementById('vCant').value);
+  const idEmp = document.getElementById('vEmpleado').value;
+  const idCli = document.getElementById('vCliente').value || null;
+  const prod = products.find(p => p.id == idProd);
+
+  if (!prod || cant > prod.stock) {
+    showToast('Error: No hay stock suficiente', true);
+    return;
+  }
+
+  try {
+    const venta = await supaFetch('venta', {
+      method: 'POST',
+      body: JSON.stringify({ id_empleado: idEmp, id_cliente: idCli, total: prod.precio * cant })
+    });
+
+    await supaFetch('venta_detalle', {
+      method: 'POST',
+      body: JSON.stringify({ id_venta: venta[0].id, id_producto: idProd, cantidad: cant, precio_unitario: prod.precio })
+    });
+
+    showToast('¡Venta registrada con éxito!');
+    closeVentaModal();
+    connectDB(); // Recarga la tabla para ver el stock actualizado
+  } catch(e) {
+    showToast('Error: ' + e.message, true);
+  }
+}
+
+function closeVentaModal() { 
+  document.getElementById('ventaModal').classList.remove('open'); 
+}
+
+function updateVentaPrecio() {
+  const sel = document.getElementById('vProducto');
+  const precio = sel.options[sel.selectedIndex]?.getAttribute('data-precio') || 0;
+  const cant = document.getElementById('vCant').value || 0;
+  document.getElementById('vTotalDisplay').textContent = '$' + (precio * cant).toFixed(2);
 }
 </script>
 </body>
 </html>
+
+
+
+
+
