@@ -406,7 +406,7 @@
   <nav style="display: flex; gap: 1rem; margin-left: 2rem;">
     <button class="btn btn-ghost btn-sm" onclick="showSection('inventario')">Inventario</button>
     <button class="btn btn-ghost btn-sm" onclick="openVentaModal()">Nueva Venta</button>
-    <button class="btn btn-ghost btn-sm" onclick="showSection('proveedores')">Proveedores</button>
+    <button class="btn btn-ghost btn-sm" onclick="openProveedorModal()">Proveedores</button>
   </nav>
   <div class="db-badge" id="dbBadge">
     <div class="dot"></div>
@@ -524,7 +524,7 @@
 <div class="toast" id="toast"></div>
 <div class="modal-overlay" id="ventaModal">
     <div class="modal" style="max-width: 600px;">
-      <h2 style="color: var(--accent); font-family: 'Bebas Neue';">💰 Registrar Nueva Venta</h2>
+      <h2 style="color: var(--accent); font-family: 'Bebas Neue';"> Registrar Nueva Venta</h2>
       <div class="form-grid">
         <div class="form-row">
           <label>Empleado</label>
@@ -543,7 +543,7 @@
         <div class="form-row">
           <label>Cantidad</label>
           <input type="number" id="vCant" value="1" min="1" oninput="updateVentaPrecio()">
-        </div>
+        </div>S
         <div class="form-row">
           <label>Total a Cobrar</label>
           <div id="vTotalDisplay" style="color:var(--accent); font-size:1.8rem; font-family:'DM Mono'; font-weight:bold;">$0.00</div>
@@ -552,6 +552,16 @@
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeVentaModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="procesarVenta()">Confirmar Venta</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="proveedorModal">
+    <div class="modal">
+      <h2 style="color: var(--accent); font-family: 'Bebas Neue';">🚚 Lista de Proveedores</h2>
+      <div id="listaProveedores" style="margin: 1rem 0; color: var(--text);">
+        </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeProveedorModal()">Cerrar</button>
       </div>
     </div>
   </div>
@@ -904,6 +914,30 @@ function updateVentaPrecio() {
   const precio = sel.options[sel.selectedIndex]?.getAttribute('data-precio') || 0;
   const cant = document.getElementById('vCant').value || 0;
   document.getElementById('vTotalDisplay').textContent = '$' + (precio * cant).toFixed(2);
+}
+  // --- FUNCIONES PARA PROVEEDORES ---
+async function openProveedorModal() {
+  try {
+    const proveedores = await supaFetch('proveedor?select=*');
+    const contenedor = document.getElementById('listaProveedores');
+    
+    if (proveedores.length === 0) {
+      contenedor.innerHTML = "<p>No hay proveedores registrados.</p>";
+    } else {
+      contenedor.innerHTML = proveedores.map(p => `
+        <div style="border-bottom: 1px solid var(--border); padding: 10px 0;">
+          <strong>${p.nombre}</strong><br>
+          <span style="color: var(--muted); font-size: 0.8rem;">Contacto: ${p.contacto || 'N/A'}</span>
+        </div>
+      `).join('');    
+    }
+    document.getElementById('proveedorModal').classList.add('open');
+  } catch (e) {
+    showToast('Error al cargar proveedores', true);
+  }
+}
+function closeProveedorModal() {
+  document.getElementById('proveedorModal').classList.remove('open');
 }
 </script>
 </body>
