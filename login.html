@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,7 +19,7 @@
       --success: #4caf50;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -29,7 +30,7 @@
       justify-content: center;
       padding: 1rem;
     }
-
+ 
     /* Background texture */
     body::before {
       content: '';
@@ -44,7 +45,7 @@
         );
       pointer-events: none;
     }
-
+ 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -56,7 +57,7 @@
       box-shadow: 0 24px 64px rgba(0,0,0,.4);
       position: relative;
     }
-
+ 
     .logo {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2.2rem;
@@ -66,7 +67,7 @@
       margin-bottom: .2rem;
     }
     .logo span { color: var(--text); }
-
+ 
     .subtitle {
       text-align: center;
       font-size: .8rem;
@@ -76,7 +77,7 @@
       text-transform: uppercase;
       margin-bottom: 2rem;
     }
-
+ 
     /* Tabs */
     .tabs {
       display: flex;
@@ -102,7 +103,7 @@
       background: var(--accent);
       color: #000;
     }
-
+ 
     /* Form */
     .form-row { margin-bottom: 1.1rem; }
     .form-row label {
@@ -131,7 +132,7 @@
       box-shadow: 0 0 0 3px rgba(232,160,32,.12);
     }
     .form-row input::placeholder { color: var(--muted); opacity: .6; }
-
+ 
     .btn {
       width: 100%;
       padding: .8rem;
@@ -153,7 +154,7 @@
       box-shadow: 0 4px 16px rgba(232,160,32,.3);
     }
     .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
+ 
     .msg {
       margin-top: 1rem;
       padding: .75rem 1rem;
@@ -165,7 +166,7 @@
     .msg.error   { background: rgba(229,57,53,.12); border: 1px solid var(--danger);  color: #ef9a9a; display: block; }
     .msg.success { background: rgba(76,175,80,.12);  border: 1px solid var(--success); color: #a5d6a7; display: block; }
     .msg.info    { background: rgba(232,160,32,.1);  border: 1px solid var(--accent);  color: var(--accent); display: block; }
-
+ 
     .divider {
       display: flex;
       align-items: center;
@@ -180,7 +181,7 @@
       height: 1px;
       background: var(--border);
     }
-
+ 
     .forgot {
       text-align: right;
       margin-top: -.5rem;
@@ -194,7 +195,7 @@
       transition: color .2s;
     }
     .forgot a:hover { color: var(--accent); }
-
+ 
     /* Loading spinner */
     .spinner {
       display: inline-block;
@@ -207,7 +208,7 @@
       margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
+ 
     /* Config panel */
     .config-panel {
       background: var(--bg);
@@ -240,7 +241,7 @@
       font-size: .82rem;
       margin-top: 0;
     }
-
+ 
     .footer-note {
       text-align: center;
       font-size: .72rem;
@@ -251,19 +252,17 @@
   </style>
 </head>
 <body>
-
+ 
 <div class="card">
   <div class="logo">Ferretería <span>Tico</span></div>
   <div class="subtitle">Sistema de Inventario</div>
-
-
-
+ 
   <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" id="tabLogin"    onclick="cambiarTab('login')">Iniciar sesión</div>
     <div class="tab"        id="tabRegister" onclick="cambiarTab('register')">Registrarse</div>
   </div>
-
+ 
   <!-- LOGIN FORM -->
   <div id="formLogin">
     <div class="form-row">
@@ -280,7 +279,7 @@
     <button class="btn" id="btnLogin" onclick="loginSubmit()">Entrar</button>
     <div class="msg" id="loginMsg"></div>
   </div>
-
+ 
   <!-- REGISTER FORM -->
   <div id="formRegister" style="display:none">
     <div class="form-row">
@@ -303,7 +302,7 @@
     <button class="btn" id="btnRegister" onclick="registerSubmit()">Crear cuenta</button>
     <div class="msg" id="registerMsg"></div>
   </div>
-
+ 
   <!-- RESET PASSWORD FORM -->
   <div id="formReset" style="display:none">
     <p style="font-size:.88rem; color:var(--muted); margin-bottom:1rem;">
@@ -322,26 +321,26 @@
     </div>
     <div class="msg" id="resetMsg"></div>
   </div>
-
+ 
   <div class="footer-note">
     Ferretería Tico · ESCOM IPN · Bases de Datos
   </div>
 </div>
-
+ 
 <script>
 // ─────────────────────────────────────────────
-//  CONFIG
+//  CONFIG  ← CORRECCIÓN: let en lugar de const
 // ─────────────────────────────────────────────
-const SUPA_URL = 'https://rvjlzqttajgmilcvmdng.supabase.co';
-const SUPA_KEY = 'sb_publishable_UFY3R95KcB4VtiEnPtHTUQ_XnNSqBcK';
+let SUPA_URL = 'https://rvjlzqttajgmilcvmdng.supabase.co';
+let SUPA_KEY = 'sb_publishable_UFY3R95KcB4VtiEnPtHTUQ_XnNSqBcK';
 // Guardar automáticamente para que index.html las tenga disponibles
 localStorage.setItem('supa_url', SUPA_URL);
 localStorage.setItem('supa_key', SUPA_KEY);
-
+ 
 window.addEventListener('DOMContentLoaded', () => {
   checkSession();
 });
-
+ 
 function guardarConfig() {
   SUPA_URL = document.getElementById('cfgUrl').value.trim().replace(/\/$/, '');
   SUPA_KEY = document.getElementById('cfgKey').value.trim();
@@ -350,7 +349,7 @@ function guardarConfig() {
   localStorage.setItem('supa_key', SUPA_KEY);
   document.getElementById('configPanel').style.display = 'none';
 }
-
+ 
 // ─────────────────────────────────────────────
 //  SUPABASE AUTH HELPERS
 // ─────────────────────────────────────────────
@@ -367,7 +366,7 @@ async function supaAuth(endpoint, body) {
   if (!res.ok) throw new Error(data.error_description || data.msg || 'Error desconocido');
   return data;
 }
-
+ 
 async function checkSession() {
   const token = localStorage.getItem('supa_token');
   if (!token || !SUPA_URL) return;
@@ -380,7 +379,7 @@ async function checkSession() {
     }
   } catch (e) {}
 }
-
+ 
 // ─────────────────────────────────────────────
 //  TABS
 // ─────────────────────────────────────────────
@@ -392,7 +391,7 @@ function cambiarTab(tab) {
   document.getElementById('tabRegister').className = 'tab' + (tab === 'register' ? ' active' : '');
   limpiarMensajes();
 }
-
+ 
 function mostrarReset() {
   document.getElementById('formLogin').style.display    = 'none';
   document.getElementById('formRegister').style.display = 'none';
@@ -400,7 +399,7 @@ function mostrarReset() {
   document.getElementById('tabLogin').className    = 'tab';
   document.getElementById('tabRegister').className = 'tab';
 }
-
+ 
 function limpiarMensajes() {
   ['loginMsg','registerMsg','resetMsg'].forEach(id => {
     const el = document.getElementById(id);
@@ -408,13 +407,13 @@ function limpiarMensajes() {
     el.textContent = '';
   });
 }
-
+ 
 function showMsg(id, tipo, texto) {
   const el = document.getElementById(id);
   el.className = `msg ${tipo}`;
   el.textContent = texto;
 }
-
+ 
 function setLoading(btnId, loading, texto) {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
@@ -422,17 +421,17 @@ function setLoading(btnId, loading, texto) {
     ? `<span class="spinner"></span>${texto}`
     : texto;
 }
-
+ 
 // ─────────────────────────────────────────────
 //  LOGIN
 // ─────────────────────────────────────────────
 async function loginSubmit() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass  = document.getElementById('loginPass').value;
-
+ 
   if (!email || !pass) { showMsg('loginMsg','error','Completa todos los campos'); return; }
   if (!SUPA_URL)        { showMsg('loginMsg','error','Configura Supabase primero'); return; }
-
+ 
   setLoading('btnLogin', true, 'Verificando...');
   try {
     const data = await supaAuth('token?grant_type=password', {
@@ -442,10 +441,10 @@ async function loginSubmit() {
     localStorage.setItem('supa_token',   data.access_token);
     localStorage.setItem('supa_refresh', data.refresh_token);
     localStorage.setItem('supa_user',    JSON.stringify(data.user));
-
+ 
     showMsg('loginMsg', 'success', '¡Bienvenido! Redirigiendo...');
     setTimeout(() => { window.location.href = 'index.html'; }, 800);
-
+ 
   } catch(e) {
     const msg = e.message.includes('Invalid login')
       ? 'Correo o contraseña incorrectos'
@@ -456,7 +455,7 @@ async function loginSubmit() {
     setLoading('btnLogin', false, 'Entrar');
   }
 }
-
+ 
 // ─────────────────────────────────────────────
 //  REGISTER
 // ─────────────────────────────────────────────
@@ -465,7 +464,7 @@ async function registerSubmit() {
   const email  = document.getElementById('regEmail').value.trim();
   const pass   = document.getElementById('regPass').value;
   const pass2  = document.getElementById('regPass2').value;
-
+ 
   if (!nombre || !email || !pass || !pass2) {
     showMsg('registerMsg','error','Completa todos los campos'); return;
   }
@@ -478,7 +477,7 @@ async function registerSubmit() {
   if (!SUPA_URL) {
     showMsg('registerMsg','error','Configura Supabase primero'); return;
   }
-
+ 
   setLoading('btnRegister', true, 'Creando cuenta...');
   try {
     await supaAuth('signup', {
@@ -497,7 +496,7 @@ async function registerSubmit() {
     setLoading('btnRegister', false, 'Crear cuenta');
   }
 }
-
+ 
 // ─────────────────────────────────────────────
 //  RESET PASSWORD
 // ─────────────────────────────────────────────
@@ -505,7 +504,7 @@ async function resetSubmit() {
   const email = document.getElementById('resetEmail').value.trim();
   if (!email) { showMsg('resetMsg','error','Ingresa tu correo'); return; }
   if (!SUPA_URL) { showMsg('resetMsg','error','Configura Supabase primero'); return; }
-
+ 
   setLoading('btnReset', true, 'Enviando...');
   try {
     await fetch(`${SUPA_URL}/auth/v1/recover`, {
@@ -524,3 +523,4 @@ async function resetSubmit() {
 </script>
 </body>
 </html>
+ 
