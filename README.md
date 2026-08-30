@@ -1,4 +1,3 @@
-
 # 🔧 Ferretería Tico — Sistema Web de Inventario
 
 ## 👥 Integrantes
@@ -146,7 +145,21 @@ Durante el desarrollo se aplicaron conocimientos de:
 * Diseño web responsivo
 
 ---
+# Administrador de chocolate 🍫🍫
+Usuario:ferreteriatico@gmail.com
+Contraseña:ferreteriatico
+# 📄 diagramas
+## Modelo relacional
 
-# 📄 Licencia
+<img src="https://github.com/user-attachments/assets/a3e1addc-0ede-4702-8982-dd64ff0fc366" loading="lazy" width="900">
 
-Proyecto desarrollado con fines educativos para la materia de Bases de Datos.
+## Entidad relacion
+
+<img src="https://github.com/user-attachments/assets/ce343743-8f4f-4e41-aed1-cbc0104da792" loading="lazy" width="900">
+
+## Entidad relacion extndido
+
+<img src="https://github.com/user-attachments/assets/e8c8a57e-58d7-45f3-81af-8fb3027bc972" loading="lazy" width="900">
+
+---
+
